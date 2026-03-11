@@ -4,5 +4,5 @@ idf_component_register(SRCS "esp_network.c"
                              esp_timer esp_system freertos)
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
-    DEVICE_NAME="SAW Fence"
+    FIRMWARE_VERSION="v1.0.0"
 )

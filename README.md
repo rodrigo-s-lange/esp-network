@@ -74,4 +74,4 @@ git submodule add https://github.com/rodrigo-s-lange/esp-network.git  components
 
 ## License
 
-MIT — © 2025 Rodrigo S. Lange
+MIT — © 2026 Rodrigo S. Lange
