@@ -4,7 +4,7 @@ WiFi Station layer for the ESP32 family with NVS persistence, mDNS and runtime A
 
 ## Dependencies
 
-> **Requires [rodrigo-s-lange/esp_at](https://github.com/rodrigo-s-lange/esp_at)**
+> **Requires [rodrigo-s-lange/esp_at](https://github.com/rodrigo-s-lange/esp-at)**
 > `esp_at_init()` must be called before `esp_network_init()`.
 
 ## Features
@@ -68,8 +68,8 @@ idf.py add-dependency "rodrigo-s-lange/esp_at>=1.0.0"
 Or as git submodules:
 
 ```bash
-git submodule add https://github.com/rodrigo-s-lange/esp_at.git      components/esp_at
-git submodule add https://github.com/rodrigo-s-lange/esp_network.git  components/esp_network
+git submodule add https://github.com/rodrigo-s-lange/esp-at.git      components/esp_at
+git submodule add https://github.com/rodrigo-s-lange/esp-network.git  components/esp_network
 ```
 
 ## License

@@ -9,7 +9,7 @@
  * @par Dependência obrigatória
  *   Requer o componente **rodrigo-s-lange/esp_at**.
  *   esp_at_init() DEVE ser chamado antes de esp_network_init().
- *   Repositório: https://github.com/rodrigo-s-lange/esp_at
+ *   Repositório: https://github.com/rodrigo-s-lange/esp-at
  *
  * Fluxo de uso:
  * @code

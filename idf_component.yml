@@ -1,13 +1,13 @@
 ## =============================================================================
 ## IDF Component: rodrigo-s-lange/esp_network
 ## Registry:      https://components.espressif.com/components/rodrigo-s-lange/esp_network
-## Repository:    https://github.com/rodrigo-s-lange/esp_network
+## Repository:    https://github.com/rodrigo-s-lange/esp-network
 ## =============================================================================
 ##
 ## ⚠  DEPENDÊNCIA INTERNA — requer rodrigo-s-lange/esp_at
 ##
 ##   Registry:    rodrigo-s-lange/esp_at >= 1.0.0
-##   Repositório: https://github.com/rodrigo-s-lange/esp_at
+##   Repositório: https://github.com/rodrigo-s-lange/esp-at
 ##
 ##   esp_at_init() DEVE ser chamado antes de esp_network_init().
 ##
@@ -16,8 +16,8 @@
 ## Para usar em outro projeto:
 ##   Via registry:  idf.py add-dependency "rodrigo-s-lange/esp_network>=1.0.0"
 ##                  idf.py add-dependency "rodrigo-s-lange/esp_at>=1.0.0"
-##   Via submodule: git submodule add https://github.com/rodrigo-s-lange/esp_at.git      components/esp_at
-##                  git submodule add https://github.com/rodrigo-s-lange/esp_network.git  components/esp_network
+##   Via submodule: git submodule add https://github.com/rodrigo-s-lange/esp-at.git      components/esp_at
+##                  git submodule add https://github.com/rodrigo-s-lange/esp-network.git  components/esp_network
 ##
 ## No código:
 ##   #include "esp_at.h"
@@ -36,8 +36,8 @@ description: >
   runtime configuration. Non-blocking reconnect via esp_timer.
   Requires rodrigo-s-lange/esp_at.
 
-url: "https://github.com/rodrigo-s-lange/esp_network"
-repository: "https://github.com/rodrigo-s-lange/esp_network.git"
+url: "https://github.com/rodrigo-s-lange/esp-network"
+repository: "https://github.com/rodrigo-s-lange/esp-network.git"
 
 license: "MIT"
 
