@@ -28,7 +28,7 @@
 ##   esp_network_start();
 ## =============================================================================
 
-version: "1.0.0"
+version: "0.1.0"
 
 description: >
   WiFi Station layer with NVS credential persistence (namespace "net"),
