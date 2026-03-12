@@ -47,6 +47,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include "esp_err.h"
 
 #ifdef __cplusplus
@@ -98,6 +99,16 @@ esp_err_t esp_network_init(void);
  * @return Outros                Erros da camada esp_wifi.
  */
 esp_err_t esp_network_start(void);
+
+/**
+ * @brief Inicializa o servidor WebTerm (HTTP + WebSocket) em porta configuravel.
+ *
+ * O recurso e opcional: so e ativado quando esta funcao e chamada.
+ *
+ * @param[in] port Porta TCP para o servidor (ex: 6000).
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_webterm_init(uint16_t port);
 
 #ifdef __cplusplus
 }

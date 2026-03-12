@@ -78,3 +78,9 @@ git commit -m "chore: update esp_network submodule"
 idf.py add-dependency "<github-user>/esp_network>=1.0.0"
 idf.py add-dependency "<github-user>/esp_at>=1.0.0"
 ```
+
+## Flash e monitorar a aplicação caso idf.py não esteja no PATH
+
+```bash
+cmd /c "call C:\esp\release-v6.0\esp-idf\export.bat && idf.py -p COM6 flash monitor"
+```

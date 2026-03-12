@@ -138,7 +138,7 @@ static void _start_mdns(void)
         return;
     }
     mdns_hostname_set(host);
-    mdns_instance_name_set(DEVICE_NAME);
+    mdns_instance_name_set((s_cfg.vendor[0] != '\0') ? s_cfg.vendor : "ESP32 Device");
     AT_I(G "mDNS: " W "%s.local", host);
 }
 

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP WebTerm</title>
+  <style>
+    :root {
+      --bg: #09141a;
+      --panel: #10232d;
+      --panel-2: #0f1c23;
+      --line: #24505f;
+      --accent: #57d9b7;
+      --text: #dff6f5;
+      --muted: #96b8b9;
+      --danger: #ff7d7d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at -20% -20%, #244f55 0%, transparent 60%),
+        radial-gradient(900px 600px at 110% 120%, #17404b 0%, transparent 65%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: min(980px, 100%);
+      background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .title {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    #terminal {
+      margin: 0;
+      height: 420px;
+      overflow: auto;
+      padding: 14px 16px;
+      background: rgba(3, 8, 10, 0.35);
+      border-bottom: 1px solid var(--line);
+      white-space: pre;
+      line-height: 1.4;
+      font-size: 13px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    #cmd {
+      width: 100%;
+      background: #0b1920;
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+      font: inherit;
+    }
+
+    #cmd:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(87, 217, 183, 0.15);
+    }
+
+    button {
+      font: inherit;
+      border: 1px solid #2c7e7d;
+      background: linear-gradient(160deg, #2b8e8d, #256f6f);
+      color: #f0ffff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      min-width: 96px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 14px 12px;
+    }
+
+    .err { color: var(--danger); }
+    .ansi-red { color: #ff7d7d; }
+    .ansi-green { color: #57d9b7; }
+    .ansi-yellow { color: #ffd166; }
+    .ansi-blue { color: #7aa2ff; }
+    .ansi-purple { color: #c792ea; }
+    .ansi-cyan { color: #7fdbff; }
+    .ansi-magenta { color: #ff8bd1; }
+    .ansi-orange { color: #ffb454; }
+    .ansi-pink { color: #ff9ad5; }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <header class="head">
+      <div class="title">ESP Terminal WebSocket</div>
+      <div class="status" id="status">Conectando...</div>
+    </header>
+
+    <pre id="terminal"></pre>
+
+    <div class="bar">
+      <input id="cmd" autocomplete="off" spellcheck="false" placeholder='Digite: AT+VER'>
+      <button id="send">Enviar</button>
+    </div>
+
+    <div class="hint">Enter envia comando. Saida refletida em tempo real.</div>
+  </section>
+
+  <script>
+    const terminal = document.getElementById("terminal");
+    const statusEl = document.getElementById("status");
+    const cmdEl = document.getElementById("cmd");
+    const sendEl = document.getElementById("send");
+
+    const wsProto = location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = wsProto + "://" + location.host + "/ws";
+    let ws;
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function ansiToHtml(input) {
+      const map = {
+        "31": "ansi-red",
+        "32": "ansi-green",
+        "33": "ansi-yellow",
+        "34": "ansi-blue",
+        "35": "ansi-purple",
+        "36": "ansi-cyan",
+        "95": "ansi-magenta",
+        "38;5;208": "ansi-orange",
+        "38;5;213": "ansi-pink"
+      };
+
+      const re = /\x1B\[([0-9;]*)m/g;
+      let out = "";
+      let last = 0;
+      let open = false;
+      let m;
+
+      while ((m = re.exec(input)) !== null) {
+        out += escapeHtml(input.slice(last, m.index));
+        const code = m[1] || "0";
+
+        if (open) {
+          out += "</span>";
+          open = false;
+        }
+
+        const cls = map[code];
+        if (cls) {
+          out += `<span class="${cls}">`;
+          open = true;
+        }
+
+        last = re.lastIndex;
+      }
+
+      out += escapeHtml(input.slice(last));
+      if (open) out += "</span>";
+      return out;
+    }
+
+    function append(text, cls = "", asLine = false) {
+      const content = ansiToHtml((text || "").replace(/\r/g, ""));
+
+      if (asLine) {
+        const line = document.createElement("div");
+        if (cls) line.className = cls;
+        line.innerHTML = content;
+        terminal.appendChild(line);
+      } else {
+        const span = document.createElement("span");
+        if (cls) span.className = cls;
+        span.innerHTML = content;
+        terminal.appendChild(span);
+      }
+
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function setStatus(text, ok) {
+      statusEl.textContent = text;
+      statusEl.style.color = ok ? "#57d9b7" : "#ff9a9a";
+      sendEl.disabled = !ok;
+    }
+
+    function connect() {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        setStatus("Conectado", true);
+        append("[webterm] conectado em " + wsUrl, "", true);
+      };
+
+      ws.onmessage = (ev) => append(ev.data || "");
+
+      ws.onclose = () => {
+        setStatus("Desconectado", false);
+        append("[webterm] conexao encerrada", "err", true);
+        setTimeout(connect, 1500);
+      };
+
+      ws.onerror = () => {
+        setStatus("Erro de conexao", false);
+      };
+    }
+
+    function sendCommand() {
+      const cmd = cmdEl.value.trim();
+      if (!cmd || !ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(cmd + "\r\n");
+      append("> " + cmd, "", true);
+      cmdEl.value = "";
+      cmdEl.focus();
+    }
+
+    sendEl.addEventListener("click", sendCommand);
+    cmdEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendCommand();
+      }
+    });
+
+    setStatus("Conectando...", false);
+    connect();
+  </script>
+</body>
+</html>
