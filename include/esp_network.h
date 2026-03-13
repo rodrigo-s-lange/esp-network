@@ -47,6 +47,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+#include <time.h>
 #include <stdint.h>
 #include "esp_err.h"
 
@@ -109,6 +111,65 @@ esp_err_t esp_network_start(void);
  * @return ESP_OK em sucesso.
  */
 esp_err_t esp_webterm_init(uint16_t port);
+
+/**
+ * @brief Inicializa a sincronizacao de horario via SNTP.
+ *
+ * Usa a camada esp_netif_sntp do ESP-IDF, com renovacao automatica apos novo IP.
+ * O componente de rede deve ter sido inicializado antes desta chamada.
+ *
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_network_time_init(void);
+
+/**
+ * @brief Finaliza a camada de tempo via SNTP.
+ */
+esp_err_t esp_network_time_deinit(void);
+
+/**
+ * @brief Informa se o horario do sistema ja foi sincronizado.
+ *
+ * @return true se ja houve sincronizacao SNTP valida.
+ */
+bool esp_network_time_is_synced(void);
+
+/**
+ * @brief Aguarda a sincronizacao SNTP por ate timeout_ms.
+ *
+ * @param[in] timeout_ms Tempo maximo de espera em milissegundos.
+ * @return ESP_OK se sincronizado dentro do prazo.
+ */
+esp_err_t esp_network_time_wait_sync(uint32_t timeout_ms);
+
+/**
+ * @brief Define o timezone POSIX usado pelo horario local.
+ *
+ * Exemplo:
+ *   "UTC0"
+ *   "<-03>3"
+ *   "BRT3BRST,M10.3.0/0,M2.3.0/0"
+ *
+ * @param[in] tz Timezone em formato POSIX TZ.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_network_set_timezone(const char *tz);
+
+/**
+ * @brief Le o horario local atual.
+ *
+ * @param[out] out_time Estrutura tm preenchida.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_network_get_local_time(struct tm *out_time);
+
+/**
+ * @brief Le o horario UTC atual.
+ *
+ * @param[out] out_time Estrutura tm preenchida.
+ * @return ESP_OK em sucesso.
+ */
+esp_err_t esp_network_get_utc_time(struct tm *out_time);
 
 #ifdef __cplusplus
 }
